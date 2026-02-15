@@ -41,6 +41,7 @@ brain/
 # Playwright
 test-results/
 playwright-report/
+tests/.auth/
 
 # Uploads
 backend/uploads/

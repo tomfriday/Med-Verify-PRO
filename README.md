@@ -1,163 +1,124 @@
 # Med-Verify PRO 🏥
 
+Profesjonalny system do rezerwacji wizyt lekarskich (Zalecenie: "Sprawa życia i śmierci").
+
 **Med-Verify PRO** to zaawansowany system rezerwacji wizyt lekarskich z podziałem na role (RBAC), autoryzacją JWT (HttpOnly Cookies) i pełną logiką biznesową.
 
 ---
 
-## 🧪 Testy (`tests/`)
+## 🧪 Testy (Playwright + TypeScript)
 
-Projekt zawiera kompleksowe testy automatyczne w **Playwright + TypeScript**, podzielone na testy **API** i **E2E** (przeglądarkowe).
-
-### Struktura testów
-
-```
-tests/
-├── api/                          # Testy API (bez przeglądarki)
-│   ├── auth.api.spec.ts          # Logowanie, rejestracja, /me, wylogowanie
-│   ├── doctors.api.spec.ts       # Lista lekarzy, filtry, sortowanie, sloty
-│   ├── appointments.api.spec.ts  # Rezerwacja wizyt, lista wizyt
-│   ├── profile.api.spec.ts       # Profil użytkownika, edycja, avatar
-│   └── admin.api.spec.ts         # RBAC, statystyki, logi audytu
-├── e2e/                          # Testy E2E (Chromium)
-│   ├── login.e2e.spec.ts         # Formularz logowania, walidacje, wylogowanie
-│   ├── patient.e2e.spec.ts       # Dashboard pacjenta, filtry, wyszukiwanie
-│   ├── doctor.e2e.spec.ts        # Dashboard lekarza, sloty, wizyty
-│   ├── admin.e2e.spec.ts         # Dashboard admina, statystyki, logi
-│   └── profile.e2e.spec.ts       # Strona profilu, edycja danych
-├── helpers/
-│   └── auth.helper.ts            # Funkcje pomocnicze (login, konta testowe)
-├── playwright.config.ts          # Konfiguracja Playwright
-├── tsconfig.json
-└── package.json
-```
+Pełne pokrycie testami E2E i API z wykorzystaniem wzorców **Page Object Model (POM)** oraz **reuse authentication state**.
 
 ### Uruchamianie testów
-
-> **Wymaga:** uruchomionego backendu (`localhost:3001`) i frontendu (`localhost:5173`).
-
 ```bash
 cd tests
-npm install
-npx playwright install chromium
+npm ci                 # Instalacja zależności
+npx playwright install # Instalacja przeglądarek
 
-# Wszystkie testy (API + E2E)
+# Uruchom wszystkie testy
 npm test
 
-# Tylko testy API
+# Tylko API / E2E
 npm run test:api
-
-# Tylko testy E2E (przeglądarkowe)
 npm run test:e2e
 
-# E2E z widoczną przeglądarką
+# Tryb z podglądem (headed)
 npm run test:headed
-
-# Otwarcie raportu HTML
-npm run test:report
 ```
 
-### Pokrycie testów
+### Architektura Testów
+- **Page Object Model (POM)**: Logika UI wydzielona do `tests/pages/` (np. `LoginPage.ts`, `PatientDashboard.ts`).
+- **Auth Reuse**: `auth.setup.ts` loguje się raz (Pacjent/Lekarz/Admin) i zapisuje stan sesji (`storageState`) do plików JSON. Testy startują od razu zalogowane.
+- **Data Seeding**: Przed startem testów baza jest resetowana endpointem `/api/test/reset` (tylko w trybie dev/test).
+- **RBAC & Security**: Testy API weryfikują uprawnienia (403 Forbidden) i kontrakt JSON (brak haseł w odpowiedziach).
+- **CI/CD**: GitHub Actions (`.github/workflows/playwright.yml`) uruchamia testy przy każdym pushu, zapisując Trace i Video w razie błędów.
 
-| Obszar | API | E2E |
-|---|:---:|:---:|
-| Logowanie / Rejestracja / Wylogowanie | ✅ | ✅ |
-| Autoryzacja JWT (HttpOnly cookie) | ✅ | — |
-| RBAC (role: PATIENT, DOCTOR, ADMIN) | ✅ | ✅ |
-| Wyszukiwanie / filtrowanie lekarzy | ✅ | ✅ |
-| Sortowanie (cena asc/desc) | ✅ | ✅ |
-| Rezerwacja wizyt | ✅ | — |
-| Profil użytkownika (edycja, avatar) | ✅ | ✅ |
-| Panel admina (statystyki, logi) | ✅ | ✅ |
-| Nawigacja (avatar w navbarze) | — | ✅ |
+### Struktura `tests/`
+```
+tests/
+├── api/             # Testy API (RBAC, kontrakty, logika)
+├── e2e/             # Testy E2E (Scenariusze użytkownika)
+├── pages/           # Page Object Models
+├── auth.setup.ts    # Globalne logowanie (tworzy .auth/*.json)
+└── playwright.config.ts
+```
 
 ---
 
-## 🚀 Jak uruchomić projekt
+## 🚀 Uruchomienie Projektu
 
-### 1. Wymagania
-- Node.js (v18+)
-- npm
+**Wymagania:** Node.js v16+, SQLite3
 
-### 2. Instalacja i Baza Danych (Backend)
+1. **Instalacja zależności**
+   ```bash
+   # Backend
+   cd backend
+   npm install
+   
+   # Frontend
+   cd ../frontend
+   npm install
+   ```
 
-Wejdź do katalogu `backend`:
-```bash
-cd backend
-npm install
-```
+2. **Konfiguracja Bazy Danych**
+   ```bash
+   cd backend
+   npm run setup # Migracje + Seedowanie danych
+   ```
 
-Przygotuj bazę danych SQLite (migracje i seed):
-```bash
-# Tworzy tabele
-npx knex migrate:latest
+3. **Uruchomienie (Dev Mode)**
+   ```bash
+   # Terminal 1 (Backend)
+   cd backend
+   npm start
+   
+   # Terminal 2 (Frontend)
+   cd frontend
+   npm run dev
+   ```
 
-# Wypełnia bazę danymi (20 lekarzy, admin, pacjenci)
-npx knex seed:run
-```
-
-Uruchom serwer (port 3001):
-```bash
-npm start
-# lub: node src/server.js
-```
-
-### 3. Frontend
-
-W nowym terminalu wejdź do katalogu `frontend`:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Aplikacja będzie dostępna pod adresem: **http://localhost:5173**
+Dostęp:
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3001`
 
 ---
 
-## 🔑 Dane logowania (Credentials)
+## 🛠 Technologie
 
-Hasło dla **wszystkich** kont to: `password123`
+- **Backend**: Node.js, Express, Knex.js, SQLite, JWT (HttpOnly), Multer (uploady)
+- **Frontend**: React, Vite, CSS Modules, Context API
+- **Testy**: Playwright, TypeScript, GitHub Actions
 
-### 👨‍💼 Administrator
-- **Email:** `admin@medverify.com`
-- **Rola:** Pełny dostęp do panelu <code>/admin</code> (statystyki, logi systemowe).
+## 🔑 Konta Testowe (Seed)
 
-### 🩺 Lekarze (Przykładowi)
-Lekarze mogą zarządzać swoim harmonogramem, wizytami i notatkami.
-
-| Imię i Nazwisko | Specjalizacja | Email |
+| Rola | Email | Hasło |
 |---|---|---|
-| **Dr. Jan Kowalski** | Internista | `jan.kowalski@medverify.com` |
-| **Dr. Maria Nowak** | Kardiolog | `maria.nowak@medverify.com` |
-| **Dr. Piotr Wiśniewski** | Neurolog | `piotr.wisniewski@medverify.com` |
-
-*(W bazie znajduje się łącznie 20 lekarzy. Login to `imie.nazwisko@medverify.com`)*
-
-### 👤 Pacjenci
-Pacjenci mogą wyszukiwać lekarzy, rezerwować wizyty i zarządzać nimi.
-
-| Użytkownik | Email |
-|---|---|
-| **Tomek Pacjent** | `patient1@test.com` |
-| **Ewa Pacjentka** | `patient2@test.com` |
+| **Pacjent** | `patient1@test.com` | `password123` |
+| **Lekarz** | `jan.kowalski@medverify.com` | `password123` |
+| **Admin** | `admin@medverify.com` | `password123` |
 
 ---
 
-## ✨ Funkcjonalności
+## 🛡 Funkcjonalności
 
-- **System ról (RBAC):** Pacjent, Lekarz, Administrator
-- **Autoryzacja JWT** z HttpOnly Cookies
-- **Wyszukiwanie lekarzy** z filtrami (specjalizacja, imię) i sortowaniem (cena, ocena)
-- **Rezerwacja wizyt** z walidacją konfliktów i automatycznym wygasaniem
-- **Panel lekarza:** zarządzanie slotami, wizytami i notatkami medycznymi
-- **Panel admina:** statystyki systemowe i logi audytu z paginacją
-- **Profil użytkownika:** edycja danych osobowych i upload avatara
-- **Responsywny UI:** ciemny motyw z efektem glassmorphism
+### 1. Uwierzytelnianie & Profil
+- Logowanie / Rejestracja
+- **Bezpieczeństwo**: Hasła hashowane (bcrypt), Tokeny w HttpOnly Cookie
+- **Profil**: Możliwość zmiany imienia i **zdjęcia profilowego (Avatar)**
+- Avatar widoczny w pasku nawigacji
 
----
+### 2. Panel Pacjenta
+- Wyszukiwanie lekarzy (Imię, Specjalizacja)
+- Filtrowanie i Sortowanie (Cena rosnąco/malejąco)
+- Rezerwacja wizyt (Sloty)
+- Podgląd "Moje Wizyty" (Statusy, Odwoływanie)
 
-## 🛠️ Technologie
-- **Backend:** Node.js, Express, SQLite, Knex.js, JWT (HttpOnly), bcryptjs, Multer
-- **Frontend:** React, Vite, CSS (Glassmorphism UI)
-- **Testy:** Playwright, TypeScript
-- **Bezpieczeństwo:** Role-Based Access Control (RBAC), walidacja konfliktów rezerwacji, wygasanie wizyt.
+### 3. Panel Lekarza
+- Zarządzanie slotami czasowymi (Dodawanie/Usuwanie)
+- Lista wizyt pacjentów
+- Zmiana statusu wizyty (Potwierdź / Odwołaj / Zakończ)
+
+### 4. Panel Admina
+- Statystyki systemu (Liczba użytkowników, wizyt)
+- **Logi Audytowe** (Kto, co, kiedy zrobił - pełna ścieżka audytowa dla compliance medycznego)

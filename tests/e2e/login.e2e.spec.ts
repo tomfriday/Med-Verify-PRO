@@ -1,68 +1,42 @@
 import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
 import { ACCOUNTS } from '../helpers/auth.helper';
 
 test.describe('Login E2E', () => {
+    let loginPage: LoginPage;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        loginPage = new LoginPage(page);
+        await loginPage.goto();
     });
 
-    test('shows login page by default', async ({ page }) => {
-        await expect(page.getByTestId('login-email')).toBeVisible();
-        await expect(page.getByTestId('login-password')).toBeVisible();
-        await expect(page.getByTestId('login-submit')).toBeVisible();
+    test('shows login page by default', async () => {
+        await loginPage.expectLoginPageVisible();
     });
 
     test('patient can log in and sees dashboard', async ({ page }) => {
-        await page.getByTestId('login-email').fill(ACCOUNTS.patient.email);
-        await page.getByTestId('login-password').fill(ACCOUNTS.patient.password);
-        await page.getByTestId('login-submit').click();
-
-        await expect(page.getByTestId('user-role')).toBeVisible({ timeout: 5000 });
+        await loginPage.login(ACCOUNTS.patient.email, ACCOUNTS.patient.password);
         await expect(page.getByTestId('user-role')).toHaveText('PACJENT');
     });
 
     test('doctor can log in and sees dashboard', async ({ page }) => {
-        await page.getByTestId('login-email').fill(ACCOUNTS.doctor.email);
-        await page.getByTestId('login-password').fill(ACCOUNTS.doctor.password);
-        await page.getByTestId('login-submit').click();
-
-        await expect(page.getByTestId('user-role')).toBeVisible({ timeout: 5000 });
+        await loginPage.login(ACCOUNTS.doctor.email, ACCOUNTS.doctor.password);
         await expect(page.getByTestId('user-role')).toHaveText('LEKARZ');
     });
 
     test('admin can log in and sees dashboard', async ({ page }) => {
-        await page.getByTestId('login-email').fill(ACCOUNTS.admin.email);
-        await page.getByTestId('login-password').fill(ACCOUNTS.admin.password);
-        await page.getByTestId('login-submit').click();
-
-        await expect(page.getByTestId('user-role')).toBeVisible({ timeout: 5000 });
+        await loginPage.login(ACCOUNTS.admin.email, ACCOUNTS.admin.password);
         await expect(page.getByTestId('user-role')).toHaveText('ADMIN');
     });
 
-    test('invalid login shows error message', async ({ page }) => {
-        await page.getByTestId('login-email').fill('wrong@test.com');
-        await page.getByTestId('login-password').fill('wrongpassword');
-        await page.getByTestId('login-submit').click();
-
-        await expect(page.locator('.alert-error')).toBeVisible({ timeout: 5000 });
-    });
-
-    test('logout button works', async ({ page }) => {
-        await page.getByTestId('login-email').fill(ACCOUNTS.patient.email);
-        await page.getByTestId('login-password').fill(ACCOUNTS.patient.password);
-        await page.getByTestId('login-submit').click();
-
-        await expect(page.getByTestId('logout-btn')).toBeVisible({ timeout: 5000 });
-        await page.getByTestId('logout-btn').click();
-
-        await expect(page.getByTestId('login-email')).toBeVisible({ timeout: 5000 });
+    test('invalid login shows error message', async () => {
+        await loginPage.login('wrong@test.com', 'wrongpassword');
+        await loginPage.expectErrorVisible();
     });
 
     test('register link navigates to registration page', async ({ page }) => {
-        const registerLink = page.getByText('Zarejestruj się');
-        await expect(registerLink).toBeVisible();
-        await registerLink.click();
+        await expect(loginPage.registerLink).toBeVisible();
+        await loginPage.registerLink.click();
         await expect(page).toHaveURL(/register/);
     });
 });

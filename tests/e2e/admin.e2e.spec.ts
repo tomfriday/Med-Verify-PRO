@@ -1,49 +1,35 @@
-import { test, expect, Page } from '@playwright/test';
-import { ACCOUNTS } from '../helpers/auth.helper';
-
-async function loginAsAdmin(page: Page) {
-    await page.goto('/');
-    await page.getByTestId('login-email').fill(ACCOUNTS.admin.email);
-    await page.getByTestId('login-password').fill(ACCOUNTS.admin.password);
-    await page.getByTestId('login-submit').click();
-    await expect(page.getByTestId('user-role')).toBeVisible({ timeout: 5000 });
-}
+import { test } from '@playwright/test';
+import { AdminDashboard } from '../pages/AdminDashboard';
 
 test.describe('Admin Dashboard E2E', () => {
+    let adminPage: AdminDashboard;
 
     test.beforeEach(async ({ page }) => {
-        await loginAsAdmin(page);
+        adminPage = new AdminDashboard(page);
+        await adminPage.page.goto('/');
     });
 
-    test('shows admin role badge', async ({ page }) => {
-        await expect(page.getByTestId('user-role')).toHaveText('ADMIN');
+    test('shows admin role badge', async () => {
+        await adminPage.expectRoleBadge('ADMIN');
     });
 
-    test('displays system statistics', async ({ page }) => {
-        await expect(page.getByTestId('stat-total-users')).toBeVisible({ timeout: 5000 });
-        await expect(page.getByTestId('stat-doctors')).toBeVisible();
-        await expect(page.getByTestId('stat-patients')).toBeVisible();
+    test('displays system statistics', async () => {
+        await adminPage.expectStatsVisible();
     });
 
-    test('displays audit log entries', async ({ page }) => {
-        // Switch to logs tab (default is stats)
-        await page.getByTestId('tab-logs').click();
-        await page.waitForTimeout(1000);
-        const logRows = page.locator('[data-testid^="audit-log-row"]');
-        await expect(logRows.first()).toBeVisible({ timeout: 15000 });
+    test('displays audit log entries', async () => {
+        await adminPage.expectAuditLogsVisible();
     });
 
-    test('navbar avatar is visible', async ({ page }) => {
-        await expect(page.locator('.navbar-avatar')).toBeVisible();
+    test('navbar avatar is visible', async () => {
+        await adminPage.expectNavbarAvatarVisible();
     });
 
-    test('clicking avatar navigates to profile', async ({ page }) => {
-        await page.locator('.navbar-profile').click();
-        await expect(page).toHaveURL(/profile/);
+    test('clicking avatar navigates to profile', async () => {
+        await adminPage.navigateToProfile();
     });
 
-    test('logout works', async ({ page }) => {
-        await page.getByTestId('logout-btn').click();
-        await expect(page.getByTestId('login-email')).toBeVisible({ timeout: 5000 });
+    test('logout works', async () => {
+        await adminPage.logout();
     });
 });

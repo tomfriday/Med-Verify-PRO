@@ -30,6 +30,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/appointments', notesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/test', require('./routes/test'));
 
 // --- Health check ---
 app.get('/api/health', (req, res) => {
