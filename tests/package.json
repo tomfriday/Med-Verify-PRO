@@ -4,9 +4,9 @@
   "description": "Playwright E2E & API tests for Med-Verify PRO",
   "scripts": {
     "test": "npx playwright test",
-    "test:api": "npx playwright test --project='API Tests'",
-    "test:e2e": "npx playwright test --project='E2E Tests'",
-    "test:headed": "npx playwright test --project='E2E Tests' --headed",
+    "test:api": "npx playwright test --project=\"API Tests\"",
+    "test:e2e": "npx playwright test --project=\"E2E Patient\" --project=\"E2E Doctor\" --project=\"E2E Admin\" --project=\"E2E Profile\" --project=\"E2E Login\"",
+    "test:headed": "npx playwright test --headed --project=\"E2E Patient\" --project=\"E2E Doctor\" --project=\"E2E Admin\" --project=\"E2E Profile\" --project=\"E2E Login\"",
     "test:report": "npx playwright show-report"
   },
   "devDependencies": {

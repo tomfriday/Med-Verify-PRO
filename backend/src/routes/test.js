@@ -17,13 +17,13 @@ router.post('/reset', async (req, res) => {
     try {
         // Clear transactional data (order matters for FK constraints)
         await db('audit_logs').del();
-        await db('notes').del();
+        await db('medical_notes').del();
         await db('appointments').del();
         await db('slots').del();
 
-        // Re-run seeds to restore baseline data
-        const knex = db;
-        await knex.seed.run();
+        // Re-run seeds using existing connection (avoids locks)
+        const seedModule = require('../../seeds/001_seed');
+        await seedModule.seed(db);
 
         res.json({
             message: 'Database reset to seed state.',

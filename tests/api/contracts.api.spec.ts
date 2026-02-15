@@ -13,17 +13,18 @@ test.describe('API Contract & Security Tests', () => {
         const { cookie } = await loginViaAPI(request, ACCOUNTS.patient.email, ACCOUNTS.patient.password);
         const res = await request.get(`${BASE}/api/auth/me`, { headers: { Cookie: cookie } });
         const body = await res.json();
+        const user = body.user;
 
         // Contract check
-        expect(body).toHaveProperty('id');
-        expect(body).toHaveProperty('email');
-        expect(body).toHaveProperty('role');
-        expect(body).toHaveProperty('full_name');
+        expect(user).toHaveProperty('id');
+        expect(user).toHaveProperty('email');
+        expect(user).toHaveProperty('role');
+        expect(user).toHaveProperty('full_name');
 
         // Security check
-        expect(body).not.toHaveProperty('password');
-        expect(body).not.toHaveProperty('hash');
-        expect(body).not.toHaveProperty('salt');
+        expect(user).not.toHaveProperty('password');
+        expect(user).not.toHaveProperty('hash');
+        expect(user).not.toHaveProperty('salt');
     });
 
     test('GET /api/doctors returns doctors without sensitive data', async ({ request }) => {
