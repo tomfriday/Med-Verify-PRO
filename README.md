@@ -2,6 +2,76 @@
 
 **Med-Verify PRO** to zaawansowany system rezerwacji wizyt lekarskich z podziałem na role (RBAC), autoryzacją JWT (HttpOnly Cookies) i pełną logiką biznesową.
 
+---
+
+## 🧪 Testy (`tests/`)
+
+Projekt zawiera kompleksowe testy automatyczne w **Playwright + TypeScript**, podzielone na testy **API** i **E2E** (przeglądarkowe).
+
+### Struktura testów
+
+```
+tests/
+├── api/                          # Testy API (bez przeglądarki)
+│   ├── auth.api.spec.ts          # Logowanie, rejestracja, /me, wylogowanie
+│   ├── doctors.api.spec.ts       # Lista lekarzy, filtry, sortowanie, sloty
+│   ├── appointments.api.spec.ts  # Rezerwacja wizyt, lista wizyt
+│   ├── profile.api.spec.ts       # Profil użytkownika, edycja, avatar
+│   └── admin.api.spec.ts         # RBAC, statystyki, logi audytu
+├── e2e/                          # Testy E2E (Chromium)
+│   ├── login.e2e.spec.ts         # Formularz logowania, walidacje, wylogowanie
+│   ├── patient.e2e.spec.ts       # Dashboard pacjenta, filtry, wyszukiwanie
+│   ├── doctor.e2e.spec.ts        # Dashboard lekarza, sloty, wizyty
+│   ├── admin.e2e.spec.ts         # Dashboard admina, statystyki, logi
+│   └── profile.e2e.spec.ts       # Strona profilu, edycja danych
+├── helpers/
+│   └── auth.helper.ts            # Funkcje pomocnicze (login, konta testowe)
+├── playwright.config.ts          # Konfiguracja Playwright
+├── tsconfig.json
+└── package.json
+```
+
+### Uruchamianie testów
+
+> **Wymaga:** uruchomionego backendu (`localhost:3001`) i frontendu (`localhost:5173`).
+
+```bash
+cd tests
+npm install
+npx playwright install chromium
+
+# Wszystkie testy (API + E2E)
+npm test
+
+# Tylko testy API
+npm run test:api
+
+# Tylko testy E2E (przeglądarkowe)
+npm run test:e2e
+
+# E2E z widoczną przeglądarką
+npm run test:headed
+
+# Otwarcie raportu HTML
+npm run test:report
+```
+
+### Pokrycie testów
+
+| Obszar | API | E2E |
+|---|:---:|:---:|
+| Logowanie / Rejestracja / Wylogowanie | ✅ | ✅ |
+| Autoryzacja JWT (HttpOnly cookie) | ✅ | — |
+| RBAC (role: PATIENT, DOCTOR, ADMIN) | ✅ | ✅ |
+| Wyszukiwanie / filtrowanie lekarzy | ✅ | ✅ |
+| Sortowanie (cena asc/desc) | ✅ | ✅ |
+| Rezerwacja wizyt | ✅ | — |
+| Profil użytkownika (edycja, avatar) | ✅ | ✅ |
+| Panel admina (statystyki, logi) | ✅ | ✅ |
+| Nawigacja (avatar w navbarze) | — | ✅ |
+
+---
+
 ## 🚀 Jak uruchomić projekt
 
 ### 1. Wymagania
@@ -73,7 +143,21 @@ Pacjenci mogą wyszukiwać lekarzy, rezerwować wizyty i zarządzać nimi.
 
 ---
 
+## ✨ Funkcjonalności
+
+- **System ról (RBAC):** Pacjent, Lekarz, Administrator
+- **Autoryzacja JWT** z HttpOnly Cookies
+- **Wyszukiwanie lekarzy** z filtrami (specjalizacja, imię) i sortowaniem (cena, ocena)
+- **Rezerwacja wizyt** z walidacją konfliktów i automatycznym wygasaniem
+- **Panel lekarza:** zarządzanie slotami, wizytami i notatkami medycznymi
+- **Panel admina:** statystyki systemowe i logi audytu z paginacją
+- **Profil użytkownika:** edycja danych osobowych i upload avatara
+- **Responsywny UI:** ciemny motyw z efektem glassmorphism
+
+---
+
 ## 🛠️ Technologie
-- **Backend:** Node.js, Express, SQLite, Knex.js, JWT (HttpOnly), bcryptjs
-- **Frontend:** React, Vite, CSS Modules (Glassmorphism UI)
+- **Backend:** Node.js, Express, SQLite, Knex.js, JWT (HttpOnly), bcryptjs, Multer
+- **Frontend:** React, Vite, CSS (Glassmorphism UI)
+- **Testy:** Playwright, TypeScript
 - **Bezpieczeństwo:** Role-Based Access Control (RBAC), walidacja konfliktów rezerwacji, wygasanie wizyt.

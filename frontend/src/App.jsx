@@ -5,6 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import ProfilePage from './pages/ProfilePage';
 
 function ProtectedRoute({ children, roles }) {
     const { user, loading } = useAuth();
@@ -51,6 +52,14 @@ export default function App() {
                 element={
                     <ProtectedRoute roles={['ADMIN']}>
                         <AdminDashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute>
+                        <ProfilePage />
                     </ProtectedRoute>
                 }
             />

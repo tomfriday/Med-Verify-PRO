@@ -37,3 +37,11 @@ Thumbs.db
 
 # Brain artifacts (optional, but good practice if personal)
 brain/
+
+# Playwright
+test-results/
+playwright-report/
+
+# Uploads
+backend/uploads/
+backend/test_start.js

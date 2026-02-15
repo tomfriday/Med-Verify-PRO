@@ -68,8 +68,14 @@ router.post('/logout', (req, res) => {
 // GET /api/auth/me
 router.get('/me', authenticate, async (req, res) => {
     try {
-        const user = await db('users').where({ id: req.user.id }).select('id', 'email', 'role', 'full_name', 'specialization').first();
+        const user = await db('users').where({ id: req.user.id }).select('id', 'email', 'role', 'full_name', 'specialization', 'avatar_url', 'phone_number').first();
         if (!user) return res.status(404).json({ error: 'Użytkownik nie znaleziony.' });
+
+        // Add full URL to avatar if it exists and is local
+        if (user.avatar_url && !user.avatar_url.startsWith('http')) {
+            user.avatar_url = `${req.protocol}://${req.get('host')}${user.avatar_url}`;
+        }
+
         res.json({ user });
     } catch (err) {
         res.status(500).json({ error: 'Błąd serwera.' });

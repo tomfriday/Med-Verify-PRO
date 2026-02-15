@@ -713,3 +713,91 @@ tr:hover td {
     gap: 10px;
   }
 }
+
+/* === Slots === */
+.slot-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  min-width: 140px;
+  transition: all var(--transition);
+}
+
+.slot-item:hover {
+  background: var(--bg-card);
+  border-color: var(--border-accent);
+}
+
+.btn-icon-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  line-height: 0.5;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: all var(--transition);
+}
+
+.btn-icon-delete:hover {
+  color: var(--danger);
+  transform: scale(1.1);
+}
+
+/* === Navbar Profile Avatar === */
+.navbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 20px;
+  transition: all var(--transition);
+}
+
+.navbar-profile:hover {
+  background: var(--bg-glass);
+}
+
+.navbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-glass);
+  border: 2px solid var(--border-glass);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color var(--transition);
+}
+
+.navbar-profile:hover .navbar-avatar {
+  border-color: var(--accent-blue);
+}
+
+.navbar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navbar-avatar span {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.navbar-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}

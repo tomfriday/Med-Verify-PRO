@@ -24,6 +24,18 @@ export function AuthProvider({ children }) {
         }
     }
 
+    async function refreshUser() {
+        try {
+            const res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
+            }
+        } catch (err) {
+            console.error('Refresh user failed:', err);
+        }
+    }
+
     async function login(email, password) {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -56,7 +68,7 @@ export function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );

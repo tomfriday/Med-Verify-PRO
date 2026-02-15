@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminDashboard() {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('stats');
     const [stats, setStats] = useState(null);
     const [logs, setLogs] = useState([]);
@@ -48,7 +50,16 @@ export default function AdminDashboard() {
             <nav className="navbar">
                 <div className="navbar-brand">Med-Verify PRO</div>
                 <div className="navbar-user">
-                    <span style={{ fontSize: '0.85rem' }}>{user.full_name}</span>
+                    <div className="navbar-profile" onClick={() => navigate('/profile')}>
+                        <div className="navbar-avatar">
+                            {user.avatar_url ? (
+                                <img src={user.avatar_url} alt="Avatar" />
+                            ) : (
+                                <span>👤</span>
+                            )}
+                        </div>
+                        <span className="navbar-name">{user.full_name}</span>
+                    </div>
                     <span className="navbar-role" data-testid="user-role">ADMIN</span>
                     <button className="btn btn-logout btn-sm" onClick={logout} data-testid="logout-btn">Wyloguj</button>
                 </div>

@@ -87,6 +87,26 @@ router.get('/slots', authenticate, authorize('DOCTOR'), async (req, res) => {
     }
 });
 
+// DELETE /api/doctors/slots/:id — DOCTOR deletes own slot
+router.delete('/slots/:id', authenticate, authorize('DOCTOR'), async (req, res) => {
+    try {
+        const slot = await db('slots').where({ id: req.params.id, doctor_id: req.user.id }).first();
+        if (!slot) {
+            return res.status(404).json({ error: 'Slot nie znaleziony.' });
+        }
+        if (!slot.is_available) {
+            return res.status(400).json({ error: 'Nie można usunąć zarezerwowanego slotu. Najpierw odwołaj wizytę.' });
+        }
+
+        await db('slots').where({ id: req.params.id }).del();
+        await auditLog(req, 'DELETE_SLOT', 'slots', `Doctor ${req.user.id} deleted slot ${req.params.id}`);
+        res.json({ message: 'Slot usunięty.' });
+    } catch (err) {
+        console.error('Delete slot error:', err);
+        res.status(500).json({ error: 'Błąd serwera.' });
+    }
+});
+
 // GET /api/doctors/:id/slots — available slots for a specific doctor
 router.get('/:id/slots', async (req, res) => {
     try {

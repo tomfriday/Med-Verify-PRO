@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function DoctorDashboard() {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('appointments');
     const [appointments, setAppointments] = useState([]);
     const [slots, setSlots] = useState([]);
@@ -97,6 +99,21 @@ export default function DoctorDashboard() {
         } catch (err) { setError(err.message); }
     }
 
+    async function deleteSlot(id) {
+        if (!window.confirm('Czy na pewno chcesz usunąć ten slot?')) return;
+        setError(''); setMessage('');
+        try {
+            const res = await fetch(`/api/doctors/slots/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            setMessage('Slot usunięty.');
+            fetchSlots();
+        } catch (err) { setError(err.message); }
+    }
+
     function formatDate(iso) {
         return new Date(iso).toLocaleString('pl-PL', {
             day: '2-digit', month: '2-digit', year: 'numeric',
@@ -113,7 +130,16 @@ export default function DoctorDashboard() {
             <nav className="navbar">
                 <div className="navbar-brand">Med-Verify PRO</div>
                 <div className="navbar-user">
-                    <span style={{ fontSize: '0.85rem' }}>{user.full_name}</span>
+                    <div className="navbar-profile" onClick={() => navigate('/profile')}>
+                        <div className="navbar-avatar">
+                            {user.avatar_url ? (
+                                <img src={user.avatar_url} alt="Avatar" />
+                            ) : (
+                                <span>👤</span>
+                            )}
+                        </div>
+                        <span className="navbar-name">{user.full_name}</span>
+                    </div>
                     <span className="navbar-role" data-testid="user-role">LEKARZ</span>
                     <button className="btn btn-logout btn-sm" onClick={logout} data-testid="logout-btn">Wyloguj</button>
                 </div>
@@ -213,9 +239,21 @@ export default function DoctorDashboard() {
                         <h3 style={{ fontSize: '0.9rem', marginBottom: 12, color: 'var(--text-secondary)' }}>Istniejące sloty ({slots.length})</h3>
                         <div className="slots-grid" data-testid="existing-slots">
                             {slots.slice(0, 40).map((s) => (
-                                <span key={s.id} className="slot-btn" style={{ cursor: 'default', opacity: s.is_available ? 1 : 0.4 }} data-testid={`slot-${s.id}`}>
-                                    {formatDate(s.start_time)} {s.is_available ? '' : '(zajęty)'}
-                                </span>
+                                <div key={s.id} className="slot-item" data-testid={`slot-${s.id}`}>
+                                    <span style={{ opacity: s.is_available ? 1 : 0.4 }}>
+                                        {formatDate(s.start_time)} {s.is_available ? '' : '(zajęty)'}
+                                    </span>
+                                    {s.is_available && (
+                                        <button
+                                            className="btn-icon-delete"
+                                            onClick={() => deleteSlot(s.id)}
+                                            title="Usuń slot"
+                                            data-testid={`delete-slot-${s.id}`}
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>

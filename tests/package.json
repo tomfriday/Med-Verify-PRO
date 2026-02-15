@@ -1,0 +1,17 @@
+{
+  "name": "med-verify-pro-tests",
+  "version": "1.0.0",
+  "description": "Playwright E2E & API tests for Med-Verify PRO",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:api": "npx playwright test --project='API Tests'",
+    "test:e2e": "npx playwright test --project='E2E Tests'",
+    "test:headed": "npx playwright test --project='E2E Tests' --headed",
+    "test:report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

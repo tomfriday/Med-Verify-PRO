@@ -9,6 +9,7 @@ const doctorRoutes = require('./routes/doctors');
 const appointmentRoutes = require('./routes/appointments');
 const notesRoutes = require('./routes/notes');
 const adminRoutes = require('./routes/admin');
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,6 +21,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static('uploads'));
 
 // --- Routes ---
 app.use('/api/auth', authRoutes);
@@ -27,6 +29,7 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/appointments', notesRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/profile', profileRoutes);
 
 // --- Health check ---
 app.get('/api/health', (req, res) => {
