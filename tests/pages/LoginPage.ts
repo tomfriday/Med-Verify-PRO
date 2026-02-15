@@ -1,8 +1,9 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 
 /**
  * Page Object Model for the Login page.
  * Encapsulates all selectors and actions for /login.
+ * All selectors use data-testid for stability.
  */
 export class LoginPage {
     readonly page: Page;
@@ -17,7 +18,7 @@ export class LoginPage {
         this.emailInput = page.getByTestId('login-email');
         this.passwordInput = page.getByTestId('login-password');
         this.submitButton = page.getByTestId('login-submit');
-        this.errorAlert = page.locator('.alert-error');
+        this.errorAlert = page.getByTestId('login-error');
         this.registerLink = page.getByText('Zarejestruj się');
     }
 
@@ -37,15 +38,5 @@ export class LoginPage {
     async login(email: string, password: string) {
         await this.fillLoginForm(email, password);
         await this.submit();
-    }
-
-    async expectLoginPageVisible() {
-        await expect(this.emailInput).toBeVisible();
-        await expect(this.passwordInput).toBeVisible();
-        await expect(this.submitButton).toBeVisible();
-    }
-
-    async expectErrorVisible() {
-        await expect(this.errorAlert).toBeVisible({ timeout: 5000 });
     }
 }

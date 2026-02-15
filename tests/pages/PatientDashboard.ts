@@ -1,9 +1,10 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 import { BaseDashboard } from './BaseDashboard';
 
 /**
  * Page Object Model for the Patient Dashboard.
  * Handles doctor search, filters, sorting, and appointment tabs.
+ * All selectors use data-testid for stability.
  */
 export class PatientDashboard extends BaseDashboard {
     readonly doctorCards: Locator;
@@ -17,29 +18,24 @@ export class PatientDashboard extends BaseDashboard {
 
     constructor(page: Page) {
         super(page);
-        this.doctorCards = page.locator('.doctor-card');
+        this.doctorCards = page.locator('[data-testid^="doctor-card"]');
         this.specializationFilter = page.getByTestId('search-specialization');
         this.sortBySelect = page.getByTestId('sort-by');
         this.sortOrderSelect = page.getByTestId('sort-order');
-        this.searchInput = page.getByPlaceholder('Wpisz imię lub nazwisko...');
+        this.searchInput = page.getByTestId('search-name');
         this.tabSearch = page.getByTestId('tab-search');
         this.tabAppointments = page.getByTestId('tab-appointments');
         this.appointmentsTable = page.getByTestId('appointments-table');
     }
 
-    async expectDoctorCardsVisible() {
-        await expect(this.doctorCards.first()).toBeVisible({ timeout: 5000 });
-    }
-
     async filterBySpecialization(value: string) {
-        await this.expectDoctorCardsVisible();
         await this.specializationFilter.selectOption(value);
         await this.page.waitForTimeout(1500);
     }
 
     async searchByName(name: string) {
         await this.searchInput.fill(name);
-        await this.page.waitForTimeout(800); // debounce
+        await this.page.waitForTimeout(800);
     }
 
     async sortBy(field: string, order: 'asc' | 'desc') {
@@ -50,7 +46,6 @@ export class PatientDashboard extends BaseDashboard {
 
     async switchToAppointmentsTab() {
         await this.tabAppointments.click();
-        await expect(this.appointmentsTable).toBeVisible({ timeout: 5000 });
     }
 
     async getDoctorCardCount(): Promise<number> {

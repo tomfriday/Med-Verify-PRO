@@ -1,8 +1,9 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 
 /**
  * Page Object Model for the Profile page.
  * Handles profile editing, avatar upload, and navigation.
+ * All selectors use data-testid for stability.
  */
 export class ProfilePage {
     readonly page: Page;
@@ -15,29 +16,21 @@ export class ProfilePage {
 
     constructor(page: Page) {
         this.page = page;
-        this.nameInput = page.locator('input[type="text"]').first();
-        this.emailInput = page.locator('input[type="email"]');
-        this.saveButton = page.getByText('Zapisz zmiany');
+        this.nameInput = page.getByTestId('profile-name');
+        this.emailInput = page.getByTestId('profile-email');
+        this.saveButton = page.getByTestId('profile-save');
         this.backButton = page.getByText('Wróć');
         this.avatarSection = page.getByText('Zmień zdjęcie');
-        this.successAlert = page.locator('.alert-success');
-    }
-
-    async expectProfileLoaded() {
-        await expect(this.page.getByText('Edycja Profilu')).toBeVisible();
-        await expect(this.nameInput).toHaveValue(/.+/);
+        this.successAlert = page.getByTestId('profile-success');
     }
 
     async updateName(name: string) {
         await this.nameInput.clear();
         await this.nameInput.fill(name);
         await this.saveButton.click();
-        await expect(this.successAlert).toBeVisible({ timeout: 5000 });
     }
 
     async goBack() {
         await this.backButton.click();
-        await this.page.waitForTimeout(500);
-        await expect(this.page).not.toHaveURL(/profile/);
     }
 }

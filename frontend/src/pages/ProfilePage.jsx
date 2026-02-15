@@ -100,8 +100,8 @@ export default function ProfilePage() {
                     <p className="section-subtitle">Zaktualizuj swoje dane osobowe i zdjęcie</p>
                 </div>
 
-                {message && <div className="alert alert-success">{message}</div>}
-                {error && <div className="alert alert-error">{error}</div>}
+                {message && <div className="alert alert-success" data-testid="profile-success">{message}</div>}
+                {error && <div className="alert alert-error" data-testid="profile-error">{error}</div>}
 
                 <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 250, textAlign: 'center' }}>
@@ -130,6 +130,7 @@ export default function ProfilePage() {
                                 <input
                                     type="text"
                                     className="form-input"
+                                    data-testid="profile-name"
                                     value={formData.full_name}
                                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                                     required
@@ -140,6 +141,7 @@ export default function ProfilePage() {
                                 <input
                                     type="email"
                                     className="form-input"
+                                    data-testid="profile-email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     required
@@ -156,7 +158,7 @@ export default function ProfilePage() {
                                 />
                             </div>
                             <div style={{ marginTop: 20, textAlign: 'right' }}>
-                                <button type="submit" className="btn btn-primary">Zapisz zmiany</button>
+                                <button type="submit" className="btn btn-primary" data-testid="profile-save">Zapisz zmiany</button>
                             </div>
                         </form>
                     </div>

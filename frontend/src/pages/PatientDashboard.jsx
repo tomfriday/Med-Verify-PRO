@@ -125,8 +125,8 @@ export default function PatientDashboard() {
             <nav className="navbar">
                 <div className="navbar-brand">Med-Verify PRO</div>
                 <div className="navbar-user">
-                    <div className="navbar-profile" onClick={() => navigate('/profile')}>
-                        <div className="navbar-avatar">
+                    <div className="navbar-profile" data-testid="navbar-profile" onClick={() => navigate('/profile')}>
+                        <div className="navbar-avatar" data-testid="navbar-avatar">
                             {user.avatar_url ? (
                                 <img src={user.avatar_url} alt="Avatar" />
                             ) : (

@@ -42,6 +42,7 @@ brain/
 test-results/
 playwright-report/
 tests/.auth/
+tests/RAPORT_TECHNIKI.md
 
 # Uploads
 backend/uploads/

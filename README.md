@@ -1,14 +1,14 @@
 # Med-Verify PRO 🏥
 
-Profesjonalny system do rezerwacji wizyt lekarskich (Zalecenie: "Sprawa życia i śmierci").
+> **System designed as Testable by Design with strict RBAC verification. E2E suite utilizes Playwright Custom Fixtures and Global Auth Setup for maximum performance and stability.**
 
-**Med-Verify PRO** to zaawansowany system rezerwacji wizyt lekarskich z podziałem na role (RBAC), autoryzacją JWT (HttpOnly Cookies) i pełną logiką biznesową.
+Profesjonalny system do rezerwacji wizyt lekarskich z podziałem na role (RBAC), autoryzacją JWT (HttpOnly Cookies) i pełną logiką biznesową.
 
 ---
 
 ## 🧪 Testy (Playwright + TypeScript)
 
-Pełne pokrycie testami E2E i API z wykorzystaniem wzorców **Page Object Model (POM)** oraz **reuse authentication state**.
+Pełne pokrycie testami E2E i API z wykorzystaniem wzorców **Custom Fixtures**, **Page Object Model (POM)**, **API Interception/Mocking** oraz **Global Auth Setup (storageState)**.
 
 ### Uruchamianie testów
 ```bash
@@ -28,19 +28,34 @@ npm run test:headed
 ```
 
 ### Architektura Testów
-- **Page Object Model (POM)**: Logika UI wydzielona do `tests/pages/` (np. `LoginPage.ts`, `PatientDashboard.ts`).
-- **Auth Reuse**: `auth.setup.ts` loguje się raz (Pacjent/Lekarz/Admin) i zapisuje stan sesji (`storageState`) do plików JSON. Testy startują od razu zalogowane.
-- **Data Seeding**: Przed startem testów baza jest resetowana endpointem `/api/test/reset` (tylko w trybie dev/test).
-- **RBAC & Security**: Testy API weryfikują uprawnienia (403 Forbidden) i kontrakt JSON (brak haseł w odpowiedziach).
-- **CI/CD**: GitHub Actions (`.github/workflows/playwright.yml`) uruchamia testy przy każdym pushu, zapisując Trace i Video w razie błędów.
+
+| Wzorzec | Opis |
+|---------|------|
+| **Custom Fixtures** | Zamiast tworzyć `new LoginPage(page)` w każdym teście, wstrzykujemy POM bezpośrednio: `({ loginPage }) => { ... }`. Czyściejszy kod, lepsze podpowiedzi TypeScript. |
+| **Page Object Model (POM)** | Logika UI wydzielona do `tests/pages/` — lokatory i akcje oddzielone od asercji. |
+| **Global Auth Setup** | `auth.setup.ts` loguje się raz (Pacjent/Lekarz/Admin) i zapisuje `storageState` do JSON. Testy startują od razu zalogowane — zero powtarzania logowania. |
+| **API Interception & Mocking** | Testy z `page.route()` przechwytują żądania i podmieniają odpowiedzi (500, puste dane, zepsuty JSON) — testowanie edge cases bez potrzeby specjalnych danych. |
+| **data-testid Only** | W POM-ach nie ma ani jednego selektora CSS. Tylko `getByTestId()` — testy nie psują się przy redesignie. |
+| **Data Seeding** | Przed startem baza resetowana endpointem `/api/test/reset` (tylko dev/test). |
+| **RBAC & Security** | Testy API weryfikują uprawnienia (403 Forbidden) i kontrakt JSON (brak haseł w odpowiedziach). |
+| **Trace Viewer + CI/CD** | GitHub Actions uruchamia testy przy każdym push. Przy błędzie: Trace (nagranie + DOM snapshoty + logi sieciowe), Video, Screenshot. |
 
 ### Struktura `tests/`
 ```
 tests/
-├── api/             # Testy API (RBAC, kontrakty, logika)
-├── e2e/             # Testy E2E (Scenariusze użytkownika)
-├── pages/           # Page Object Models
-├── auth.setup.ts    # Globalne logowanie (tworzy .auth/*.json)
+├── api/               # Testy API (RBAC, kontrakty, logika)
+├── e2e/               # Testy E2E (Scenariusze użytkownika)
+│   ├── admin.e2e.spec.ts
+│   ├── doctor.e2e.spec.ts
+│   ├── patient.e2e.spec.ts
+│   ├── profile.e2e.spec.ts
+│   ├── login.e2e.spec.ts
+│   ├── search.e2e.spec.ts       # Data-Driven Testing
+│   └── api-mocking.e2e.spec.ts  # API Interception & Mocking
+├── pages/             # Page Object Models (tylko lokatory + akcje)
+├── helpers/           # Helpery (auth, API)
+├── fixtures.ts        # Custom Playwright Fixtures
+├── auth.setup.ts      # Global Auth Setup (storageState)
 └── playwright.config.ts
 ```
 
@@ -88,7 +103,7 @@ Dostęp:
 
 - **Backend**: Node.js, Express, Knex.js, SQLite, JWT (HttpOnly), Multer (uploady)
 - **Frontend**: React, Vite, CSS Modules, Context API
-- **Testy**: Playwright, TypeScript, GitHub Actions
+- **Testy**: Playwright, TypeScript, Custom Fixtures, GitHub Actions
 
 ## 🔑 Konta Testowe (Seed)
 

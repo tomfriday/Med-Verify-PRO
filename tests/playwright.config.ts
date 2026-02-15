@@ -93,6 +93,34 @@ export default defineConfig({
             },
         },
 
+        // ───── E2E — SEARCH (data-driven, patient auth) ─────
+        {
+            name: 'E2E Search',
+            testDir: './e2e',
+            testMatch: /search\.e2e\.spec\.ts/,
+            dependencies: ['Auth Setup'],
+            use: {
+                browserName: 'chromium',
+                headless: true,
+                viewport: { width: 1280, height: 720 },
+                storageState: path.join(AUTH_DIR, 'patient.json'),
+            },
+        },
+
+        // ────── E2E — API MOCKING (patient auth) ──────
+        {
+            name: 'E2E API Mocking',
+            testDir: './e2e',
+            testMatch: /api-mocking\.e2e\.spec\.ts/,
+            dependencies: ['Auth Setup'],
+            use: {
+                browserName: 'chromium',
+                headless: true,
+                viewport: { width: 1280, height: 720 },
+                storageState: path.join(AUTH_DIR, 'patient.json'),
+            },
+        },
+
         // ────────── E2E — LOGIN (no auth) ─────────
         {
             name: 'E2E Login',

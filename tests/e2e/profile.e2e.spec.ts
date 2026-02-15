@@ -1,36 +1,27 @@
-import { test, expect } from '@playwright/test';
-import { ProfilePage } from '../pages/ProfilePage';
-import { PatientDashboard } from '../pages/PatientDashboard';
+import { test, expect } from '../fixtures';
 
 test.describe('Profile Page E2E', () => {
-    let profilePage: ProfilePage;
-    let dashboard: PatientDashboard;
 
-    test.beforeEach(async ({ page }) => {
-        dashboard = new PatientDashboard(page);
-        await dashboard.page.goto('/');
-        await dashboard.navigateToProfile();
-        profilePage = new ProfilePage(page);
+    test('profile page loads with user data', async ({ profilePage, page }) => {
+        await expect(page.getByText('Edycja Profilu')).toBeVisible();
+        await expect(profilePage.nameInput).toHaveValue(/.+/);
     });
 
-    test('profile page loads with user data', async () => {
-        await profilePage.expectProfileLoaded();
-    });
-
-    test('shows avatar section', async () => {
+    test('shows avatar section', async ({ profilePage }) => {
         await expect(profilePage.avatarSection).toBeVisible();
     });
 
-    test('email field is populated', async () => {
-        // We assume the user is the one from auth.setup.ts
+    test('email field is populated', async ({ profilePage }) => {
         await expect(profilePage.emailInput).toHaveValue(/.+@.+\..+/);
     });
 
-    test('can update profile name', async () => {
+    test('can update profile name', async ({ profilePage }) => {
         await profilePage.updateName('Tomek Pacjent Updated');
+        await expect(profilePage.successAlert).toBeVisible();
     });
 
-    test('back button works', async () => {
+    test('back button works', async ({ profilePage, page }) => {
         await profilePage.goBack();
+        await expect(page).not.toHaveURL(/profile/);
     });
 });

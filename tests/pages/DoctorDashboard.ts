@@ -1,9 +1,10 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 import { BaseDashboard } from './BaseDashboard';
 
 /**
  * Page Object Model for the Doctor Dashboard.
  * Handles slot management, appointments, and notes tabs.
+ * All selectors use data-testid for stability.
  */
 export class DoctorDashboard extends BaseDashboard {
     readonly tabAppointments: Locator;
@@ -28,11 +29,7 @@ export class DoctorDashboard extends BaseDashboard {
         this.slotStartInput = page.getByTestId('slot-start');
         this.slotEndInput = page.getByTestId('slot-end');
         this.createSlotsBtn = page.getByTestId('create-slots-btn');
-        this.navbar = page.locator('.navbar');
-    }
-
-    async expectDashboardLoaded() {
-        await expect(this.navbar).toBeVisible({ timeout: 5000 });
+        this.navbar = page.getByTestId('doctor-navbar');
     }
 
     async switchToSlotsTab() {

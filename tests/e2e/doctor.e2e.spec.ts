@@ -1,31 +1,27 @@
-import { test } from '@playwright/test';
-import { DoctorDashboard } from '../pages/DoctorDashboard';
+import { test, expect } from '../fixtures';
 
 test.describe('Doctor Dashboard E2E', () => {
-    let doctorPage: DoctorDashboard;
 
-    test.beforeEach(async ({ page }) => {
-        doctorPage = new DoctorDashboard(page);
-        await doctorPage.page.goto('/');
+    test('shows doctor role badge', async ({ doctorPage }) => {
+        await expect(doctorPage.roleBadge).toBeVisible();
+        await expect(doctorPage.roleBadge).toHaveText('LEKARZ');
     });
 
-    test('shows doctor role badge', async () => {
-        await doctorPage.expectRoleBadge('LEKARZ');
+    test('dashboard loads successfully', async ({ doctorPage }) => {
+        await expect(doctorPage.navbar).toBeVisible();
     });
 
-    test('dashboard loads successfully', async () => {
-        await doctorPage.expectDashboardLoaded();
+    test('navbar avatar is visible', async ({ doctorPage }) => {
+        await expect(doctorPage.navbarAvatar).toBeVisible();
     });
 
-    test('navbar avatar is visible', async () => {
-        await doctorPage.expectNavbarAvatarVisible();
-    });
-
-    test('clicking avatar navigates to profile', async () => {
+    test('clicking avatar navigates to profile', async ({ doctorPage, page }) => {
         await doctorPage.navigateToProfile();
+        await expect(page).toHaveURL(/profile/);
     });
 
-    test('logout works', async () => {
+    test('logout works', async ({ doctorPage, page }) => {
         await doctorPage.logout();
+        await expect(page.getByTestId('login-email')).toBeVisible();
     });
 });

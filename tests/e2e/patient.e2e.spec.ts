@@ -1,44 +1,39 @@
-import { test, expect } from '@playwright/test';
-import { PatientDashboard } from '../pages/PatientDashboard';
+import { test, expect } from '../fixtures';
 
 test.describe('Patient Dashboard E2E', () => {
-    let patientPage: PatientDashboard;
 
-    test.beforeEach(async ({ page }) => {
-        patientPage = new PatientDashboard(page);
-        await patientPage.page.goto('/');
+    test('shows doctor cards', async ({ patientPage }) => {
+        await expect(patientPage.doctorCards.first()).toBeVisible({ timeout: 5000 });
     });
 
-    test('shows doctor cards', async () => {
-        await patientPage.expectDoctorCardsVisible();
-    });
-
-    test('specialization filter works', async () => {
+    test('specialization filter works', async ({ patientPage }) => {
         await patientPage.filterBySpecialization('Kardiolog');
         const count = await patientPage.getDoctorCardCount();
         expect(count).toBeGreaterThan(0);
     });
 
-    test('search by doctor name works', async () => {
+    test('search by doctor name works', async ({ patientPage }) => {
         await patientPage.searchByName('Kowalski');
-        await patientPage.expectDoctorCardsVisible();
+        await expect(patientPage.doctorCards.first()).toBeVisible();
     });
 
-    test('sort direction toggle works', async () => {
+    test('sort direction toggle works', async ({ patientPage }) => {
         await patientPage.sortBy('price', 'desc');
         const count = await patientPage.getDoctorCardCount();
         expect(count).toBeGreaterThan(0);
     });
 
-    test('can switch to "Moje Wizyty" tab', async () => {
+    test('can switch to "Moje Wizyty" tab', async ({ patientPage }) => {
         await patientPage.switchToAppointmentsTab();
+        await expect(patientPage.appointmentsTable).toBeVisible();
     });
 
-    test('navbar avatar is visible', async () => {
-        await patientPage.expectNavbarAvatarVisible();
+    test('navbar avatar is visible', async ({ patientPage }) => {
+        await expect(patientPage.navbarAvatar).toBeVisible();
     });
 
-    test('clicking avatar navigates to profile', async () => {
+    test('clicking avatar navigates to profile', async ({ patientPage, page }) => {
         await patientPage.navigateToProfile();
+        await expect(page).toHaveURL(/profile/);
     });
 });

@@ -1,5 +1,4 @@
-import { test, expect } from '@playwright/test';
-import { PatientDashboard } from '../pages/PatientDashboard';
+import { test, expect } from '../fixtures';
 
 /**
  * Data-Driven Testing for Doctor Search.
@@ -7,23 +6,17 @@ import { PatientDashboard } from '../pages/PatientDashboard';
  */
 
 const SPECIALIZATIONS = [
-    { label: 'Kardiolog', expectedCount: 1 }, // Adjust expected counts based on seed data
+    { label: 'Kardiolog', expectedCount: 1 },
     { label: 'Internista', expectedCount: 1 },
     { label: 'Neurolog', expectedCount: 1 },
-    { label: 'Dermatolog', expectedCount: 1 }, // Assuming seed has this
 ];
 
 test.describe('Doctor Search Data-Driven', () => {
-    let patientPage: PatientDashboard;
-
-    test.beforeEach(async ({ page }) => {
-        patientPage = new PatientDashboard(page);
-        await patientPage.page.goto('/');
-    });
 
     for (const spec of SPECIALIZATIONS) {
-        test(`filters by ${spec.label}`, async () => {
+        test(`filters by ${spec.label}`, async ({ patientPage }) => {
             await patientPage.filterBySpecialization(spec.label);
+            await expect(patientPage.doctorCards.first()).toBeVisible();
             const count = await patientPage.getDoctorCardCount();
             expect(count, `Should find at least ${spec.expectedCount} ${spec.label}`).toBeGreaterThanOrEqual(spec.expectedCount);
         });

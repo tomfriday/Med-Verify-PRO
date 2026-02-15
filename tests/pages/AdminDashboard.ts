@@ -1,9 +1,10 @@
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 import { BaseDashboard } from './BaseDashboard';
 
 /**
  * Page Object Model for the Admin Dashboard.
  * Handles statistics, audit logs, and tab navigation.
+ * All selectors use data-testid for stability.
  */
 export class AdminDashboard extends BaseDashboard {
     readonly tabStats: Locator;
@@ -27,19 +28,8 @@ export class AdminDashboard extends BaseDashboard {
         this.auditLogsTable = page.getByTestId('audit-logs-table');
     }
 
-    async expectStatsVisible() {
-        await expect(this.statTotalUsers).toBeVisible({ timeout: 5000 });
-        await expect(this.statDoctors).toBeVisible();
-        await expect(this.statPatients).toBeVisible();
-    }
-
     async switchToLogsTab() {
         await this.tabLogs.click();
         await this.page.waitForTimeout(1000);
-    }
-
-    async expectAuditLogsVisible() {
-        await this.switchToLogsTab();
-        await expect(this.auditLogRows.first()).toBeVisible({ timeout: 15000 });
     }
 }
