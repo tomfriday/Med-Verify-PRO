@@ -1,0 +1,19 @@
+{
+    "name": "k6-performance-tests",
+    "version": "1.0.0",
+    "description": "K6 performance tests for Med-Verify PRO (TypeScript, native K6 runtime)",
+    "scripts": {
+        "test:smoke": "k6 run scenarios/smoke-health.ts",
+        "test:auth": "k6 run scenarios/auth-flow.ts",
+        "test:doctors": "k6 run scenarios/doctors-list.ts",
+        "test:appointments": "k6 run scenarios/appointments.ts",
+        "test:admin": "k6 run scenarios/admin-stats.ts",
+        "test:booking": "k6 run scenarios/booking-flow.ts",
+        "test:suite": "k6 run scenarios/full-suite.ts",
+        "test:all": "k6 run scenarios/smoke-health.ts && k6 run scenarios/auth-flow.ts && k6 run scenarios/doctors-list.ts && k6 run scenarios/appointments.ts && k6 run scenarios/admin-stats.ts && k6 run scenarios/booking-flow.ts"
+    },
+    "devDependencies": {
+        "@types/k6": "^0.54.2",
+        "typescript": "^5.7.3"
+    }
+}
